@@ -138,7 +138,7 @@ const parseToQuery = (args: OperationArgs): string => {
     toQuery.draft = args.draft
   }
 
-  if ('req' in args) {
+  if ('req' in args && args.req) {
     const req = args.req as PayloadRequest
 
     if (req.searchParams) {

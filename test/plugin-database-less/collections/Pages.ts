@@ -12,7 +12,7 @@ export const Pages: CollectionConfig = {
     useAsTitle: 'title',
   },
   versions: {
-    drafts: true,
+    drafts: { schedulePublish: true },
   },
   fields: [
     {
