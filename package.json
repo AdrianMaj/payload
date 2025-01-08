@@ -111,6 +111,7 @@
     "@jest/globals": "29.7.0",
     "@libsql/client": "0.14.0",
     "@next/bundle-analyzer": "15.0.3",
+    "@payloadcms/database-less": "workspace:*",
     "@payloadcms/db-postgres": "workspace:*",
     "@payloadcms/eslint-config": "workspace:*",
     "@payloadcms/eslint-plugin": "workspace:*",

@@ -3,8 +3,7 @@
   "compilerOptions": {
     "composite": false,
     "noEmit": true,
-    "baseUrl": ".",
-
+    "baseUrl": "."
   },
   "references": [
     {
@@ -53,6 +52,9 @@
       "path": "./packages/plugin-redirects"
     },
     {
+      "path": "./packages/plugin-database-less"
+    },
+    {
       "path": "./packages/plugin-search"
     },
     {
@@ -76,6 +78,7 @@
   ],
   "include": [
     "${configDir}/src",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts",
+    "./test/plugin-database-less/.db-less-next/types/**/*.ts"
   ]
 }

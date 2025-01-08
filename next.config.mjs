@@ -1,6 +1,7 @@
 import bundleAnalyzer from '@next/bundle-analyzer'
 import { withSentryConfig } from '@sentry/nextjs'
 import { withPayload } from './packages/next/src/withPayload.js'
+import { withDatabaseLess } from '@payloadcms/database-less/withDatabaseLess'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
@@ -11,7 +12,7 @@ const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
 })
 
-const config = withBundleAnalyzer(
+let config = withBundleAnalyzer(
   withPayload({
     eslint: {
       ignoreDuringBuilds: true,
@@ -24,6 +25,7 @@ const config = withBundleAnalyzer(
         bodySizeLimit: '5mb',
       },
     },
+    distDir: process.env.NEXT_DIST_DIR,
     env: {
       PAYLOAD_CORE_DEV: 'true',
       ROOT_DIR: path.resolve(dirname),
@@ -59,9 +61,16 @@ const config = withBundleAnalyzer(
   }),
 )
 
-export default process.env.NEXT_PUBLIC_SENTRY_DSN
-  ? withSentryConfig(config, {
-      telemetry: false,
-      tunnelRoute: '/monitoring-tunnel',
-    })
-  : config
+if (process.env.NEXT_PUBLIC_SENTRY_DSN) {
+  config = withSentryConfig(config, {
+    telemetry: false,
+    tunnelRoute: '/monitoring-tunnel',
+  })
+}
+
+if (process.env.DATABASE_LESS_MODE === 'true') {
+  console.log('ENV DB LESS')
+  config = withDatabaseLess(config, { externalURL: 'http://localhost:3000' })
+}
+
+export default config

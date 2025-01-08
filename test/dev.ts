@@ -3,6 +3,7 @@ import chalk from 'chalk'
 import { createServer } from 'http'
 import minimist from 'minimist'
 import nextImport from 'next'
+import { spawn } from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -48,12 +49,16 @@ if (args.turbo === true) {
   process.env.TURBOPACK = '1'
 }
 
-const { beforeTest } = await createTestHooks(testSuiteArg)
-await beforeTest()
+if (process.env.DISABLE_TEST_HOOKS !== 'true') {
+  const { beforeTest } = await createTestHooks(testSuiteArg)
+  await beforeTest()
+}
 
 const { rootDir, adminRoute } = getNextRootDir(testSuiteArg)
 
-await safelyRunScriptFunction(runInit, 4000, testSuiteArg, true)
+if (process.env.DISABLE_TEST_HOOKS !== 'true') {
+  await safelyRunScriptFunction(runInit, 4000, testSuiteArg, true)
+}
 
 if (shouldStartMemoryDB) {
   await startMemoryDB()
@@ -68,7 +73,38 @@ if (args.o) {
   await open(`http://localhost:3000${adminRoute}`)
 }
 
-const port = process.env.PORT ? Number(process.env.PORT) : 3000
+let defaultPort = 3000
+if (testSuiteArg === 'plugin-database-less' && process.env.DATABASE_LESS_MODE !== 'true') {
+  defaultPort = 3001
+
+  console.log('Spawning db-less instance')
+  const databaseLessInstance = spawn('pnpm', ['dev', 'plugin-database-less', '--o'], {
+    env: {
+      ...process.env,
+      DATABASE_LESS_MODE: 'true',
+      NODE_ENV: 'development',
+      WRITE_DB_ADAPTER: 'false',
+      DISABLE_TEST_HOOKS: 'true',
+      // Change .next dir for this process to avoid overlap
+      NEXT_DIST_DIR: './test/plugin-database-less/.db-less-next',
+    },
+    cwd: process.cwd(),
+  })
+
+  databaseLessInstance.stdout.on('data', (data) => {
+    console.log(chalk.gray(`DB-LESS-INSTANCE [LOG]: ${data}`))
+  })
+
+  databaseLessInstance.stderr.on('data', (data) => {
+    console.error(chalk.gray(`DB-LESS-INSTANCE [ERR]: ${data}`))
+  })
+
+  databaseLessInstance.on('close', (code) => {
+    console.log(`DB-LESS-INSTANCE exited with code ${code}`)
+  })
+}
+
+const port = process.env.PORT ? Number(process.env.PORT) : defaultPort
 
 // @ts-expect-error the same as in test/helpers/initPayloadE2E.ts
 const app = nextImport({
