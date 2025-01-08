@@ -100,7 +100,6 @@ export type BeforeOperationHook = (args: {
    */
   operation: HookOperationType
   req: PayloadRequest
-  setReturnValue: (value: unknown) => void
 }) => any
 
 export type BeforeValidateHook<T extends TypeWithID = any> = (args: {
