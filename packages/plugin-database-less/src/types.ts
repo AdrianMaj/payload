@@ -6,7 +6,6 @@ export interface PluginConfig {
 }
 
 export interface NextPluginConfig {
-  adminRoute?: string
   apiRoute?: string
   disabled?: boolean
   externalAdminPath?: string

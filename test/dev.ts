@@ -78,7 +78,7 @@ if (testSuiteArg === 'plugin-database-less' && process.env.DATABASE_LESS_MODE !=
   defaultPort = 3001
 
   console.log('Spawning db-less instance')
-  const databaseLessInstance = spawn('pnpm', ['dev', 'plugin-database-less', '--o'], {
+  const databaseLessInstance = spawn('pnpm', ['dev', 'plugin-database-less'], {
     env: {
       ...process.env,
       DATABASE_LESS_MODE: 'true',
@@ -92,11 +92,11 @@ if (testSuiteArg === 'plugin-database-less' && process.env.DATABASE_LESS_MODE !=
   })
 
   databaseLessInstance.stdout.on('data', (data) => {
-    console.log(chalk.gray(`DB-LESS-INSTANCE [LOG]: ${data}`))
+    console.log(chalk.greenBright(`DB-LESS-INSTANCE: ${data}`))
   })
 
   databaseLessInstance.stderr.on('data', (data) => {
-    console.error(chalk.gray(`DB-LESS-INSTANCE [ERR]: ${data}`))
+    console.error(chalk.greenBright(`DB-LESS-INSTANCE [ERR]: ${data}`))
   })
 
   databaseLessInstance.on('close', (code) => {

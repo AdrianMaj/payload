@@ -69,8 +69,9 @@ if (process.env.NEXT_PUBLIC_SENTRY_DSN) {
 }
 
 if (process.env.DATABASE_LESS_MODE === 'true') {
-  console.log('ENV DB LESS')
-  config = withDatabaseLess(config, { externalURL: 'http://localhost:3000' })
+  config = withDatabaseLess(config, {
+    externalURL: 'http://localhost:3001',
+  })
 }
 
 export default config

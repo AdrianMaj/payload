@@ -11,7 +11,7 @@ export const withDatabaseLess = (config, pluginOptions) => {
 
   const incomingRewrites = config.rewrites
 
-  const { adminRoute = '/admin', apiRoute = '/api', externalURL } = pluginOptions
+  const { apiRoute = '/api', externalURL } = pluginOptions
 
   config.rewrites = async () => {
     /** @type {Awaited<ReturnType<NonNullable<import("next").NextConfig['rewrites']>>>} */
@@ -28,20 +28,21 @@ export const withDatabaseLess = (config, pluginOptions) => {
     // TODO use real vars
 
     rewrites.push({
-      source: '/api/:path*',
-      destination: 'http://localhost:3001/api/:path*',
+      source: `${apiRoute}/:path*`,
+      destination: `${externalURL}${apiRoute}/:path*`,
     })
 
-    rewrites.push({
-      source: '/admin/:path*',
-      has: [
-        {
-          type: 'header',
-          key: 'Next-Action',
-        },
-      ],
-      destination: 'http://localhost:3001/admin/:path*',
-    })
+    // Can't rewrite server actions because different instances have different Server Action ID
+    // rewrites.push({
+    //   source: '/admin/:path*',
+    //   has: [
+    //     {
+    //       type: 'header',
+    //       key: 'Next-Action',
+    //     },
+    //   ],
+    //   destination: 'http://localhost:3001/admin/:path*',
+    // })
 
     return rewrites
   }
